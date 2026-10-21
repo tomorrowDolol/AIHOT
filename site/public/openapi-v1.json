@@ -19,7 +19,7 @@
     "/api/v1/items": {
       "get": {
         "operationId": "items",
-        "summary": "List recent public AI items",
+        "summary": "List recent public industry items",
         "description": "Start here for feeds, widgets and 'what is new' views. Covers the last 7 days only. Send If-None-Match and you get a 304 with an empty body whenever nothing changed. To follow new items, page back with cursor only until you reach an id you already have. Do not use this to maintain a complete local copy of the selected set: it is windowed, so anything older than 7 days silently falls out. Use /api/v1/selected/snapshot plus /api/v1/selected/changes for that.",
         "parameters": [
           {
@@ -412,7 +412,7 @@
       "get": {
         "operationId": "storyByPublicId",
         "summary": "Get a story (event) with its coverage timeline and AI digest",
-        "description": "One story = one real-world event aggregated from every covering source: a reverse-chronological coverage timeline, an AI digest that is rewritten incrementally as the event evolves (contradictions with earlier reporting are stated explicitly), and links to same-storyline and related stories. Extract ids from the final path segment of a hot-topics links.story HTML URL, or use ids from another story's storyline/related refs; never request links.story as JSON. Merged stories answer with a 308 to the surviving id. Call this endpoint only with an id actually returned by the API; a 404 means the public story layer or that story is unavailable.",
+        "description": "One story = one real-world event aggregated from every covering source: a reverse-chronological coverage timeline, a digest that is rewritten incrementally as the event evolves (contradictions with earlier reporting are stated explicitly), and links to same-storyline and related stories. Extract ids from the final path segment of a hot-topics links.story HTML URL, or use ids from another story's storyline/related refs; never request links.story as JSON. Merged stories answer with a 308 to the surviving id. Call this endpoint only with an id actually returned by the API; a 404 means the public story layer or that story is unavailable.",
         "parameters": [
           {
             "$ref": "#/components/parameters/ActorUserAgent"
@@ -2838,7 +2838,7 @@
       "get": {
         "operationId": "agentStory",
         "summary": "A story's timeline as an agent answer",
-        "description": "Latest development, AI digest, reports from newest to oldest and related stories. Only use addresses given by /api/v1/agent/hot or another story answer.",
+        "description": "Latest development, digest, reports from newest to oldest and related stories. Only use addresses given by /api/v1/agent/hot or another story answer.",
         "parameters": [
           {
             "$ref": "#/components/parameters/ActorUserAgent"
@@ -3501,7 +3501,7 @@
               "string",
               "null"
             ],
-            "description": "Reader-facing recommendation reason, the same text shown as 推荐理由 on the website. Always present on /api/v1/items; null when the item is not selected or has no reader-facing reason. Selected snapshot and changes do not include this field yet."
+            "description": "Reader-facing recommendation reason, the same text shown as 情报价值 on the website. Always present on /api/v1/items; null when the item is not selected or has no reader-facing reason. Selected snapshot and changes do not include this field yet."
           },
           "attribution": {
             "$ref": "#/components/schemas/Attribution"

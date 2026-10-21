@@ -1,12 +1,12 @@
 
 【标题自洽规则 — 让读者不点开就知道"这是关于谁的什么事"】
 
-1. 标题必须点出核心主体：模型名 / 产品名 / 公司名 / 项目名。
+1. 标题必须点出核心主体：品牌名 / 型号 / 产品线 / 认证名。
 2. 原标题已经清楚点出主体的：英文标题翻译成中文、中文标题保持原意，不要为改写而改写。
-3. 原标题只是版本号 / 代号 / 没信息量的 teaser（如 "v2.1.159"、"Small is a feature"、"Day 1"、"重磅发布"）时，结合【来源】和正文把主体补进标题。例：原标题 "v2.1.159" + 来源 "Claude Code：GitHub Releases" → "Claude Code v2.1.159 发布"。
-4. 补主体只能用【来源】或正文里真实出现的名字。正文和来源都没点出具体型号时，用上位词（如"开源多模态模型"）兜底，绝不凭"行业常识"编一个具体型号 / 版本 / 数字。
-5. 原标题表达的【文章类型和核心动作】是硬边界：How / Why / Guide / Analysis / Review / Benchmark 这类解释、分析、教程或评测标题，中文标题必须保留这个类型；不能因为正文谈到一个已经存在的模型、产品或新数据，就改写成“发布 / 推出 / 上线 / 开源”。只有原标题明确宣布了发布、推出、上线或开源，中文标题才能使用对应动作。保留文章类型不等于删主体：仍须按第 1-4 条补全正文或来源明确给出的公司、产品、项目名。
-   例：原标题 "How GPT-5.6 fuses frontier intelligence with frontier efficiency" → "GPT-5.6 如何兼顾前沿智能与效率"，不能写成 "OpenAI 发布 GPT-5.6"。
-   例：原标题 "How to build interactive experiences with canvases" + 来源和正文明确是 GitHub Copilot → "GitHub Copilot 如何用 canvases 构建交互体验"，不能只写成缺主体的 "如何用 canvases 构建交互体验"。
-6. 本条的动作和背景里的旧发布要分清：原文把发布写成过去的事（“At DevDay, we introduced …”“Last week we launched …”“上周我们发布了…”），本条是在讲用法、做演示或再次推广时，标题写介绍、演示或讲解，把发布交代成此前的事；不能写成“推出 / 发布 / 上线”，否则读者会当成今天的新闻。只有原文明确某项能力是现在才开放或新增，才对那一项用对应动作。
-   例：正文 "At DevDay, we introduced ChatGPT Space … See how it works below" → "OpenAI 演示 DevDay 发布的 ChatGPT Space 团队协作用法"，不能写成 "OpenAI 在 DevDay 推出 ChatGPT Space"。
+3. 原标题只是型号代号 / 没信息量的 teaser（如 "EB8504H"、"New arrival"、"Day 1"、"重磅发布"）时，结合【来源】和正文把主体补进标题。例：原标题 "EB8504H" + 来源 "SENSSUN 新品" → "香山 EB8504H 体重秤开售"。
+4. 补主体只能用【来源】或正文里真实出现的名字。正文和来源都没点出具体型号时，用上位词（如"八电极体脂秤"）兜底，绝不凭"行业常识"编一个具体型号 / 认证编号 / 价格。
+5. 原标题表达的【文章类型和核心动作】是硬边界：How / Why / Guide / Analysis / Review / Teardown 这类解释、分析、教程或评测标题，中文标题必须保留这个类型；不能因为正文谈到一个已经存在的型号、产品或新数据，就改写成“发布 / 推出 / 开售 / 上架”。只有原标题明确宣布了发布、推出、开售或上架，中文标题才能使用对应动作。保留文章类型不等于删主体：仍须按第 1-4 条补全正文或来源明确给出的品牌、型号、产品线。
+   例：原标题 "How Withings improved body composition accuracy" → "Withings 如何提升体成分测量准确性"，不能写成 "Withings 发布新体脂秤"。
+   例：原标题 "How to get stable readings on a bathroom scale" + 来源和正文明确是香山 → "香山体重秤如何获得稳定读数"，不能只写成缺主体的 "体重秤如何获得稳定读数"。
+6. 本条的动作和背景里的旧发布要分清：原文把发布写成过去的事（“At IFA, we introduced …”“Last week we launched …”“上周我们发布了…”），本条是在讲用法、做演示或再次推广时，标题写介绍、演示或讲解，把发布交代成此前的事；不能写成“推出 / 发布 / 开售”，否则读者会当成今天的情报。只有原文明确某个型号或认证是现在才开放或新增，才对那一项用对应动作。
+   例：正文 "At IFA, we introduced the new body composition scale … See how it works below" → "Withings 演示 IFA 发布的体成分秤用法"，不能写成 "Withings 在 IFA 推出体成分秤"。

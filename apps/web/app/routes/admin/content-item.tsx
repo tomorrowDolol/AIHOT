@@ -1,4 +1,4 @@
-import { SITE } from "@aihot/site";
+import { ITEM_COPY, SITE } from "@aihot/site";
 import { useState, type ReactNode } from "react";
 import { Link } from "react-router";
 import { CATEGORY_KEYS, CATEGORY_LABELS } from "@aihot/contracts/taxonomy";
@@ -181,7 +181,7 @@ export default function ContentItem({ loaderData }: Route.ComponentProps) {
                     ["栏目", p.category ? CATEGORY_LABELS[p.category as keyof typeof CATEGORY_LABELS] ?? p.category : null],
                     ["标签", (p.tags as string[] | null)?.join("、")],
                     ["摘要", p.summary],
-                    ["推荐理由", p.reason],
+                    [ITEM_COPY.reasonLabel, p.reason],
                     [
                       "正文展示",
                       `${p.body_mode}${p.syndicate ? " · 对外可带全文" : ""}${
@@ -361,7 +361,7 @@ export default function ContentItem({ loaderData }: Route.ComponentProps) {
       >
         <Field label="标题"><Input value={fields.title} placeholder={p?.title ?? ""} onChange={(e) => setFields({ ...fields, title: e.target.value })} /></Field>
         <Field label="摘要"><Textarea rows={3} value={fields.summary} placeholder={p?.summary ?? ""} onChange={(e) => setFields({ ...fields, summary: e.target.value })} /></Field>
-        <Field label="推荐理由"><Textarea rows={2} value={fields.reason} placeholder={p?.reason ?? ""} onChange={(e) => setFields({ ...fields, reason: e.target.value })} /></Field>
+        <Field label={ITEM_COPY.reasonLabel}><Textarea rows={2} value={fields.reason} placeholder={p?.reason ?? ""} onChange={(e) => setFields({ ...fields, reason: e.target.value })} /></Field>
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="栏目">
             <Select value={fields.category} onChange={(e) => setFields({ ...fields, category: e.target.value })}>

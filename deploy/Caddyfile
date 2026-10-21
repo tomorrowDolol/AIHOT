@@ -1,5 +1,12 @@
 # HTTPS in front of the site: Caddy gets and renews the certificate for SITE_DOMAIN and compresses
 # responses. Point the domain's DNS at this server first.
+#
+# This deployment is an internal intelligence site: every request must pass the shared password below.
+# Generate the hash once and put both values in .env (see docs/deploy.md):
+#   docker run --rm caddy:2-alpine caddy hash-password --plaintext 'your-password'
+#   BASIC_AUTH_USER=intel
+#   BASIC_AUTH_HASH=$2a$14$...
+# Without both values Caddy refuses to start, which is safer than serving the site unprotected.
 {$SITE_DOMAIN} {
 	encode zstd gzip
 	header ?Strict-Transport-Security "max-age=31536000"
@@ -7,5 +14,9 @@
 	header ?X-Content-Type-Options "nosniff"
 	header ?Referrer-Policy "strict-origin-when-cross-origin"
 	header ?Permissions-Policy "camera=(), microphone=(), geolocation=()"
+	header ?X-Robots-Tag "noindex, nofollow, noarchive"
+	basic_auth {
+		{$BASIC_AUTH_USER} {$BASIC_AUTH_HASH}
+	}
 	reverse_proxy web:3000
 }

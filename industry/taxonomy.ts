@@ -6,63 +6,177 @@
  * 网页上的类别（筛选栏、卡片角标、RSS 分类订阅）。key 是网址和接口里的身份，上线后不要改。
  * section 是日报里的分节标题（几个类别可以共用一节，按这里的顺序排）；guide 告诉结构抽取模型这一类收什么、
  * 和相邻类别的边界在哪（总的归类原则写在 prompts/structure.md 里）。
- * commentary 标出评论类（教程、观点）：日报写过的事又有评论类的后续报道，只占一行快讯（报道它的信源够多时除外）。
+ * commentary 标出评论类（观点）：日报写过的事又有评论类的后续报道，只占一行快讯（报道它的信源够多时除外）。
  * 没归上类的资料在日报里放进第一个 key 为 industry 的类别所在的节（没有就放最后一节）。
  * tagColor 是飞书推送卡片里跟在标题后面的这一类小标签的颜色（飞书 text_tag 的颜色名）。
  * feedLabel 是分类 RSS 标题里的名字（不写就用 label）。公开接口、RSS 和 MCP 里要把一类并进另一类发布，写在站点设置里（site/site.ts 的 PUBLIC_CATEGORIES）。
+ *
+ * 这份分类按“它要求你做什么决策”切，不按产品线切；产品线放在标签（TOPIC_TAGS）里，
+ * 因为一条情报通常同时涉及多条产品线，而日报只能给它一个位置。
  */
 export const CATEGORIES = [
-  { key: "ai-models", tagColor: "indigo", label: "模型", feedLabel: "AI 模型", section: "模型发布/更新", guide: "模型本身的发布、版本、权重开放、能力或价格变化，以及既有榜单上的模型成绩。公布一次跑分不是发布新基准，也不是教程。" },
-  { key: "ai-products", tagColor: "turquoise", label: "产品", feedLabel: "AI 产品", section: "产品发布/更新", guide: "可使用的 AI 产品、功能、应用、工具、API、平台和工程组件的发布更新。模型厂商发布的推理框架、算子库、硬件适配组件仍是产品，不能因为厂商名归成模型。" },
-  { key: "industry", tagColor: "orange", label: "行业", feedLabel: "行业动态", section: "行业动态", guide: "已发生的公司经营、融资并购、人事、合作、诉讼、政策、真实安全事故及调查进展。新闻由当事人发帖、带有态度，也不因此变成观点。" },
-  { key: "paper", tagColor: "violet", label: "论文", feedLabel: "论文", section: "论文研究", guide: "以新研究方法、实验设计与发现为核心的论文、技术报告、新基准或研究数据集。系统性红队实验属于研究；既有榜单成绩归模型，真实事故的新闻调查归行业。" },
-  { key: "tip", tagColor: "green", label: "教程", section: "技巧与观点", guide: "读者可以照着使用的方法、提示词、工具用法、工程实践复盘与技术讲解。重点是可复用的做法；单纯发布工具归产品，只有态度和预测而无做法归观点。", commentary: true },
-  { key: "opinion", tagColor: "purple", label: "观点", section: "技巧与观点", guide: "重点是作者的解释、判断、主张、预测、评论或访谈观点。讨论市场不自动归行业，作者是名人不自动归观点。", commentary: true },
+  {
+    key: "product",
+    tagColor: "indigo",
+    label: "新品与价格",
+    feedLabel: "新品与价格",
+    section: "新品与价格",
+    guide: "竞品或渠道上的整机新品、型号、规格、开售、众筹、换代，以及价格调整、促销机制、套装和赠品。只改包装、换颜色、补一个地区的上架也算新品与价格，但只在有具体型号或价格时收录；没有参数的“即将发布”不算。",
+  },
+  {
+    key: "component",
+    tagColor: "turquoise",
+    label: "供应链与器件",
+    feedLabel: "供应链与器件",
+    section: "供应链与器件",
+    guide: "整机上游的器件、模组、方案与产能：BIA 前端芯片、称重传感器与应变片、蓝牙 SoC、电池、玻璃面板、LCD/OLED、结构件，以及涨价、交期、缺货、PCN、EOL、替代料和参考设计。器件厂商的普通公司新闻归行业，只有涉及产品、价格、产能或停产时归这一类。",
+  },
+  {
+    key: "compliance",
+    tagColor: "orange",
+    label: "合规与召回",
+    feedLabel: "合规与召回",
+    section: "合规与召回",
+    guide: "进入市场必须满足的规则和已经发生的质量后果：计量器具型式批准、OIML、CE、FCC、欧盟 MDR、美国 FDA、RoHS、REACH、Prop 65、UN38.3、电池法规，以及召回、下架、处罚、集体诉讼和认证失效。标准草案征求意见也算；纯学术的测量误差研究归技术。",
+  },
+  {
+    key: "channel",
+    tagColor: "gold",
+    label: "渠道与平台",
+    feedLabel: "渠道与平台",
+    section: "渠道与平台",
+    guide: "卖货的地方改了规则：Amazon、天猫、京东、拼多多、抖音、TikTok Shop 的类目、准入、合规审核、佣金、物流、评价与广告政策，以及线下商超和药房的进场规则。平台大促的招商规则归这里；某个品牌自己的促销归新品与价格。",
+  },
+  {
+    key: "industry",
+    tagColor: "purple",
+    label: "公司与资本",
+    feedLabel: "公司与资本",
+    section: "公司与资本",
+    guide: "公司经营与资本层面已经发生的事：财报、出货量、均价、区域结构、融资、并购、IPO、产能、工厂、人事、客户绑定、专利诉讼和反倾销。产品本身的发布归新品与价格；只有经营结果和资本动作归这里。",
+  },
+  {
+    key: "tech",
+    tagColor: "violet",
+    label: "技术与专利",
+    feedLabel: "技术与专利",
+    section: "技术与专利",
+    guide: "测量与算法本身：多频与八电极方案、体成分算法、与 DXA 或其他专业设备的对照研究、心率/体态等衍生测量、App 与健康平台接入、OTA 和隐私设计，以及专利公开与授权。拆机和实测归拆机实测，不归这里。",
+  },
+  {
+    key: "adjacent",
+    tagColor: "green",
+    label: "替代与邻接",
+    feedLabel: "替代与邻接",
+    section: "替代与邻接",
+    guide: "可能替代家用秤或与它抢同一需求的东西：智能手表与戒指的体成分功能、专业体测设备、健身房与体检套餐、减重药物与健康管理服务，以及同供应链的邻接品类（智能垃圾桶、手环）。只有明确影响称重与体成分需求时才归这里。",
+  },
+  {
+    key: "opinion",
+    tagColor: "rose",
+    label: "观点与拆解",
+    feedLabel: "观点与拆解",
+    section: "观点与拆解",
+    guide: "作者的解释、判断、预测、访谈，以及拆机报告和带数据的实测。拆机与实测只要给出方案、BOM、成本或可复现的测量结果，就按正常价值评价；没有数据、只是开箱和带货的，归其他并压低分数。",
+    commentary: true,
+  },
 ] as const satisfies ReadonlyArray<{ key: string; tagColor: string; label: string; feedLabel?: string; section: string; guide: string; commentary?: true }>;
 
 /**
- * 这个行业最受关注的一类发布（AI 行业是新模型）：日报报头的“N 个新模型”、改分类后修订已出的报告都按它数。
+ * 这个行业最受关注的一类发布（这里是整机新品）：日报报头的“N 款新品”、改分类后修订已出的报告都按它数。
  * category 是类别，tag 是标签，两者都对上才算；unit 接在数字后面。
  * 没有这样一类的行业设成 null，报头就不显示这个数。
  */
-export const RELEASE: { category: string; tag: string; unit: string } | null = { category: "ai-models", tag: "模型发布", unit: "个新模型" };
+export const RELEASE: { category: string; tag: string; unit: string } | null = { category: "product", tag: "新品发布", unit: "款新品" };
 
 /** 周报月报的总述可以直接写、不必在报道里找到出处的行业通用词（小写）。站名会自动算进去。 */
-export const PLAIN_TERMS: readonly string[] = ["ai", "api", "llm", "gpu", "agi", "ceo", "ipo"];
+export const PLAIN_TERMS: readonly string[] = [
+  "ai", "app", "bia", "ble", "bom", "ce", "ceo", "cpa", "eol", "fcc", "fda", "ipo", "mdr", "oem", "odm", "oiml", "ota", "pcn", "rohs", "sku", "wi-fi", "wifi",
+];
 
 /**
  * 内容理解一步给每篇资料判的“内容类型”（写在 prompts/content-understanding.md 里，改了类型要同步改那份提示词）。
  * 评分提示词（prompts/selection-score.md）按类型给五个维度不同的权重。
  */
-export const ITEM_TYPES = ["model_release", "product_launch", "tool_or_prompt", "research_paper", "industry_event", "opinion_analysis", "tutorial_explainer"] as const;
+export const ITEM_TYPES = [
+  "new_product", "price_change", "certification", "recall_quality", "component_change",
+  "channel_rule", "company_capital", "technical_research", "teardown_review", "market_data",
+] as const;
 
 // ── 标签词表 ────────────────────────────────────────────────────────────────────────────
 
 /** 每篇资料的第一个标签必须是这些“分类标签”之一。 */
 export const CATEGORY_TAGS = [
-  "产品更新", "模型发布", "论文/研究", "开源/仓库", "教程/实践", "现象/趋势", "大佬观点", "评测/基准", "安全/对齐", "行业动态", "政策/监管",
-  "非AI/通用工具", "其他",
+  "新品发布", "价格变动", "器件变更", "认证法规", "召回质量", "渠道规则", "公司动态", "技术研究", "拆机实测", "市场数据", "观点", "其他",
 ] as const;
 
-/** 可选的主题标签。 */
+/** 可选的主题标签：产品线、技术、渠道、合规。 */
 export const TOPIC_TAGS = [
-  "Agent", "编码", "推理", "多模态", "语音", "视频", "图像生成", "RAG", "端侧", "数据/训练", "搜索", "部署/工程", "开源生态", "具身智能", "MCP/工具调用",
+  // 产品线
+  "体脂秤", "体重秤", "厨房秤", "行李秤", "珠宝秤", "婴儿秤", "机械秤", "商用秤", "计价秤", "智能手环", "智能垃圾桶",
+  // 技术与器件
+  "八电极", "四电极", "多频BIA", "应变片", "称重芯片", "BLE", "Wi-Fi", "OTA", "体成分算法", "App", "健康平台", "智能手表", "智能戒指",
+  // 渠道
+  "Amazon", "天猫", "京东", "抖音", "拼多多", "TikTok Shop", "线下渠道",
+  // 合规
+  "CE", "FCC", "MDR", "FDA", "CPA", "OIML", "RoHS", "REACH", "Prop 65", "UN38.3",
 ] as const;
 
 /** 可选的实体标签（公司、机构、平台）。 */
-export const ENTITY_TAGS = ["OpenAI", "Anthropic", "DeepSeek", "DeepMind", "Google", "Meta", "Microsoft", "xAI", "Hugging Face", "GitHub", "arXiv"] as const;
+export const ENTITY_TAGS = [
+  "小米", "华为", "荣耀", "沃莱", "云麦", "乐心", "香山",
+  "Withings", "Tanita", "Omron", "InBody", "Fitbit", "Garmin", "Renpho", "Etekcity", "arboleaf",
+  "TI", "ADI", "芯海", "Nordic", "泰凌微", "乐鑫", "巨微",
+  "Amazon", "天猫", "京东", "抖音", "TikTok Shop",
+] as const;
 
 /** 模型常写的近义词，统一成词表里的写法。 */
 export const TAG_SYNONYMS: Readonly<Record<string, string>> = {
-  "教程/玩法": "教程/实践", "技巧/最佳实践": "教程/实践", "合作/生态": "行业动态", "融资/收购": "行业动态", "公司动态": "行业动态",
-  合作: "行业动态", 生态: "行业动态", 融资: "行业动态", 收购: "行业动态", 投资: "行业动态", 并购: "行业动态",
-  政策: "政策/监管", 监管: "政策/监管", 法规: "政策/监管", 安全: "安全/对齐", 对齐: "安全/对齐",
-  论文: "论文/研究", 研究: "论文/研究", paper: "论文/研究", papers: "论文/研究",
-  "open-source": "开源/仓库", 开源: "开源/仓库", 仓库: "开源/仓库", repo: "开源/仓库",
-  教程: "教程/实践", 玩法: "教程/实践", 指南: "教程/实践", 技巧: "教程/实践", 最佳实践: "教程/实践", 实践: "教程/实践",
-  产品: "产品更新", 更新: "产品更新", 发布: "模型发布", 模型: "模型发布", 趋势: "现象/趋势", 现象: "现象/趋势", 观点: "大佬观点",
-  视频生成: "视频", 非ai: "非AI/通用工具", "non-ai": "非AI/通用工具", 通用工具: "非AI/通用工具", 工程工具: "非AI/通用工具",
-  安全扫描: "非AI/通用工具", devops: "非AI/通用工具", 行业: "行业动态", 动态: "行业动态",
+  // 产品线
+  智能体脂秤: "体脂秤", 体脂称: "体脂秤", 人体成分秤: "体脂秤", 体成分秤: "体脂秤",
+  人体秤: "体重秤", 体重计: "体重秤", 智能秤: "体重秤", 电子体重秤: "体重秤",
+  厨房电子秤: "厨房秤", 营养秤: "厨房秤", 食物秤: "厨房秤",
+  手提秤: "行李秤", 行李电子秤: "行李秤", 吊秤: "行李秤",
+  珠宝称: "珠宝秤", 婴儿体重秤: "婴儿秤", 婴儿电子秤: "婴儿秤",
+  机械人体秤: "机械秤", 机械体重秤: "机械秤",
+  商用电子秤: "商用秤", 收银秤: "计价秤", 条码秤: "计价秤",
+  // 技术
+ 生物电阻抗: "多频BIA", 生物电阻抗分析: "多频BIA", 双频BIA: "多频BIA",
+  蓝牙: "BLE", 低功耗蓝牙: "BLE", 蓝牙模块: "BLE",
+  称重传感器: "应变片", 传感器: "应变片",
+  // 渠道
+  亚马逊: "Amazon", 淘宝: "天猫", 天猫商城: "天猫", 京东商城: "京东", 抖店: "抖音",
+  跨境电商: "Amazon",
+  // 合规
+  欧盟CE: "CE", 美国FCC: "FCC", 医疗器械指令: "MDR", 美国FDA: "FDA",
+  计量认证: "CPA", 型式批准: "CPA", 型式评价: "CPA",
+  有害物质限制: "RoHS", 化学品注册: "REACH",
+  // 情报类型
+  新品: "新品发布", 发布: "新品发布", 上新: "新品发布", 开售: "新品发布",
+  价格: "价格变动", 调价: "价格变动", 涨价: "价格变动", 降价: "价格变动", 促销: "价格变动",
+  供应链: "器件变更", 芯片: "器件变更", 缺货: "器件变更", 交期: "器件变更",
+  法规: "认证法规", 认证: "认证法规", 合规: "认证法规", 标准: "认证法规",
+  召回: "召回质量", 质量: "召回质量", 下架: "召回质量",
+  渠道: "渠道规则", 平台规则: "渠道规则", 类目: "渠道规则",
+  财报: "公司动态", 融资: "公司动态", 并购: "公司动态", 人事: "公司动态",
+  专利: "技术研究", 论文: "技术研究", 研究: "技术研究",
+  测评: "拆机实测", 拆机: "拆机实测", 实测: "拆机实测", 评测: "拆机实测",
+  榜单: "市场数据", 市场: "市场数据", 出货: "市场数据",
+  评论: "观点", 访谈: "观点", 趋势: "观点",
+  // 大小写与英文写法
+  app: "App", ble: "BLE", "wi-fi": "Wi-Fi", wifi: "Wi-Fi", ota: "OTA",
+  amazon: "Amazon", tmall: "天猫", jd: "京东", douyin: "抖音", "tiktok shop": "TikTok Shop",
+  ce: "CE", fcc: "FCC", mdr: "MDR", fda: "FDA", cpa: "CPA", oiml: "OIML", rohs: "RoHS", reach: "REACH",
+  "prop 65": "Prop 65", "un38.3": "UN38.3",
+  xiaomi: "小米", huawei: "华为", honor: "荣耀", wole: "沃莱", yunmai: "云麦", lifesense: "乐心",
+  withings: "Withings", tanita: "Tanita", omron: "Omron", inbody: "InBody", fitbit: "Fitbit",
+  garmin: "Garmin", renpho: "Renpho", etekcity: "Etekcity", arboleaf: "arboleaf",
+  ti: "TI", adi: "ADI", chipsemi: "芯海", nordic: "Nordic", telink: "泰凌微", espressif: "乐鑫", juwei: "巨微",
+  // 实体
+  米家: "小米", MIJIA: "小米", Xiaomi: "小米",
+  Huawei: "华为", HONOR: "荣耀", Wole: "沃莱", Yunmai: "云麦", Lifesense: "乐心",
+  SENSSUN: "香山", CAMRY: "香山", 香山衡器: "香山", 香山股份: "香山",
+  "Texas Instruments": "TI", "Analog Devices": "ADI", Chipsea: "芯海", Telink: "泰凌微", Espressif: "乐鑫",
 };
 
 // ── 公司与主体 ──────────────────────────────────────────────────────────────────────────
@@ -74,24 +188,57 @@ export const TAG_SYNONYMS: Readonly<Record<string, string>> = {
  * 所有这些名字都用来认出说的是哪家公司，比如把事实的主体对到发布方。
  */
 export const ENTITIES: Record<string, { name: string; displayTag: string | null; aliases: string[]; orgNames?: string[]; otherNames?: string[] }> = {
-  "world-labs": { name: "World Labs", displayTag: null, aliases: ["World Labs"] },
-  "thinking-machines": { name: "Thinking Machines Lab", displayTag: null, aliases: ["Thinking Machines"] },
-  amd: { name: "AMD", displayTag: null, aliases: ["AMD", "Advanced Micro Devices"] },
-  openai: { name: "OpenAI", displayTag: "OpenAI", aliases: ["OpenAI", "ChatGPT", "Sora", "Codex", "GPT"], orgNames: ["OpenAI"], otherNames: ["OpenAI Developers"] },
-  anthropic: { name: "Anthropic", displayTag: "Anthropic", aliases: ["Anthropic", "Claude"], orgNames: ["Anthropic"], otherNames: ["Claude Code"] },
-  google: { name: "Google", displayTag: "Google", aliases: ["Google", "DeepMind", "Gemini", "谷歌"], orgNames: ["Google DeepMind", "Google Research", "Google", "DeepMind", "谷歌"], otherNames: ["Google AI", "Google Labs", "Google Cloud"] },
-  deepseek: { name: "DeepSeek", displayTag: "DeepSeek", aliases: ["DeepSeek", "深度求索"], orgNames: ["DeepSeek", "深度求索"] },
-  qwen: { name: "千问 Qwen", displayTag: null, aliases: ["Qwen", "通义", "阿里"], orgNames: ["通义千问", "通义实验室", "阿里巴巴", "阿里云", "阿里", "Qwen Team", "Qwen", "Alibaba"], otherNames: ["千问", "千问APP", "Alibaba Cloud"] },
-  kimi: { name: "Kimi / 月之暗面", displayTag: null, aliases: ["Kimi", "月之暗面", "Moonshot"], orgNames: ["Moonshot AI", "月之暗面", "Kimi"] },
-  minimax: { name: "MiniMax", displayTag: null, aliases: ["MiniMax", "海螺"], orgNames: ["MiniMax", "稀宇科技"] },
-  zhipu: { name: "智谱 GLM", displayTag: null, aliases: ["智谱", "GLM", "Z.ai"], orgNames: ["智谱AI", "智谱", "Zhipu AI", "Z.ai"], otherNames: ["Zhipu"] },
-  xai: { name: "xAI", displayTag: "xAI", aliases: ["xAI", "Grok"], orgNames: ["SpaceX Super Intelligence", "SpaceXAI", "SpaceXSI", "xAI"], otherNames: ["Grok Bot"] },
-  meta: { name: "Meta", displayTag: "Meta", aliases: ["Meta", "Llama"], orgNames: ["Meta Superintelligence Labs", "Meta AI", "Meta"], otherNames: ["AI at Meta", "Muse"] },
-  microsoft: { name: "Microsoft", displayTag: "Microsoft", aliases: ["Microsoft", "微软", "Copilot"], orgNames: ["Microsoft Research", "Microsoft AI", "Microsoft", "微软"] },
-  nvidia: { name: "NVIDIA", displayTag: null, aliases: ["NVIDIA", "英伟达"], orgNames: ["NVIDIA", "英伟达"] },
-  "hugging-face": { name: "Hugging Face", displayTag: "Hugging Face", aliases: ["Hugging Face"], orgNames: ["Hugging Face", "HuggingFace"] },
-  cursor: { name: "Cursor", displayTag: null, aliases: ["Cursor", "Anysphere"], orgNames: ["Cursor"] },
-  openrouter: { name: "OpenRouter", displayTag: null, aliases: ["OpenRouter"], orgNames: ["OpenRouter"] },
+  senssun: {
+    name: "香山",
+    displayTag: "香山",
+    aliases: ["香山", "SENSSUN", "CAMRY", "金叶", "康美", "香山衡器", "香山股份"],
+    orgNames: ["广东香山电子科技有限公司", "广东香山衡器集团股份有限公司", "香山衡器", "SENSSUN"],
+    otherNames: ["CAMRY", "金叶", "康美"],
+  },
+  xiaomi: {
+    name: "小米 / 米家",
+    displayTag: "小米",
+    aliases: ["小米", "米家", "Xiaomi", "MIJIA"],
+    orgNames: ["小米集团", "小米", "Xiaomi"],
+    otherNames: ["米家", "MIJIA", "小米商城"],
+  },
+  huawei: {
+    name: "华为",
+    displayTag: "华为",
+    aliases: ["华为", "Huawei"],
+    orgNames: ["华为", "华为终端", "Huawei"],
+    otherNames: ["华为运动健康", "华为智选"],
+  },
+  honor: { name: "荣耀", displayTag: "荣耀", aliases: ["荣耀", "HONOR"], orgNames: ["荣耀", "HONOR"] },
+  wole: { name: "沃莱", displayTag: "沃莱", aliases: ["沃莱", "沃莱科技", "Wole"], orgNames: ["广东沃莱科技有限公司", "沃莱科技", "Wole"] },
+  yunmai: { name: "云麦", displayTag: "云麦", aliases: ["云麦", "Yunmai"], orgNames: ["云麦科技", "Yunmai"] },
+  lifesense: {
+    name: "乐心",
+    displayTag: "乐心",
+    aliases: ["乐心", "乐心医疗", "Lifesense"],
+    orgNames: ["广东乐心医疗电子股份有限公司", "乐心医疗", "Lifesense"],
+  },
+  withings: { name: "Withings", displayTag: "Withings", aliases: ["Withings"], orgNames: ["Withings"] },
+  tanita: { name: "Tanita", displayTag: "Tanita", aliases: ["Tanita", "百利达"], orgNames: ["Tanita"] },
+  omron: { name: "Omron 欧姆龙", displayTag: "Omron", aliases: ["Omron", "欧姆龙"], orgNames: ["Omron", "欧姆龙"] },
+  inbody: { name: "InBody", displayTag: "InBody", aliases: ["InBody"], orgNames: ["InBody"] },
+  fitbit: { name: "Fitbit", displayTag: "Fitbit", aliases: ["Fitbit"], orgNames: ["Fitbit"] },
+  garmin: { name: "Garmin 佳明", displayTag: "Garmin", aliases: ["Garmin", "佳明"], orgNames: ["Garmin", "佳明"] },
+  renpho: { name: "Renpho", displayTag: "Renpho", aliases: ["Renpho"], orgNames: ["Renpho"] },
+  etekcity: { name: "Etekcity", displayTag: "Etekcity", aliases: ["Etekcity"], orgNames: ["Etekcity"] },
+  arboleaf: { name: "arboleaf", displayTag: "arboleaf", aliases: ["arboleaf"], orgNames: ["arboleaf"] },
+  ti: { name: "TI 德州仪器", displayTag: "TI", aliases: ["TI", "Texas Instruments", "德州仪器"], orgNames: ["Texas Instruments", "德州仪器"] },
+  adi: { name: "ADI 亚德诺", displayTag: "ADI", aliases: ["ADI", "Analog Devices", "亚德诺"], orgNames: ["Analog Devices", "亚德诺"] },
+  chipsemi: { name: "芯海科技", displayTag: "芯海", aliases: ["芯海", "芯海科技", "Chipsea"], orgNames: ["芯海科技", "Chipsea"] },
+  nordic: { name: "Nordic", displayTag: "Nordic", aliases: ["Nordic", "Nordic Semiconductor"], orgNames: ["Nordic Semiconductor"] },
+  telink: { name: "泰凌微", displayTag: "泰凌微", aliases: ["泰凌微", "Telink"], orgNames: ["泰凌微电子", "Telink"] },
+  espressif: { name: "乐鑫", displayTag: "乐鑫", aliases: ["乐鑫", "Espressif", "ESP32"], orgNames: ["乐鑫科技", "Espressif"] },
+  juwei: { name: "巨微", displayTag: "巨微", aliases: ["巨微", "Juwei"], orgNames: ["巨微集成电路", "Juwei"] },
+  amazon: { name: "Amazon", displayTag: "Amazon", aliases: ["Amazon", "亚马逊"], orgNames: ["Amazon"] },
+  tmall: { name: "天猫", displayTag: "天猫", aliases: ["天猫", "Tmall"], orgNames: ["天猫"] },
+  jd: { name: "京东", displayTag: "京东", aliases: ["京东", "JD.com"], orgNames: ["京东"] },
+  douyin: { name: "抖音", displayTag: "抖音", aliases: ["抖音", "Douyin"], orgNames: ["抖音电商"] },
+  tiktokshop: { name: "TikTok Shop", displayTag: "TikTok Shop", aliases: ["TikTok Shop", "TikTokShop"], orgNames: ["TikTok Shop"] },
 };
 
 /**
@@ -99,57 +246,51 @@ export const ENTITIES: Record<string, { name: string; displayTag: string | null;
  * 行业没有这个问题时可以留空数组。
  */
 export const IDENTITY_LEXICON: ReadonlyArray<{ id: string; name: string; patterns: RegExp[] }> = [
-  { id: "openai", name: "OpenAI", patterns: [/openai|chatgpt|\bgpt-?[o\d]|\bsora\b|\bcodex\b/i] },
-  { id: "anthropic", name: "Anthropic", patterns: [/anthropic|\bclaude\b/i, /\b(?:opus|sonnet|haiku)\s*\d+(?:[.\-]\d+)*\b/i, /\bfable\s*\d+(?:[.\-]\d+)*\b|\bmythos\b/i] },
-  { id: "google", name: "Google / Gemini", patterns: [/google|deepmind|\bgemini\b|notebooklm|\bveo\s?\d|\bAlphaFold\b|\bAMIE\b/i] },
-  { id: "deepseek", name: "DeepSeek", patterns: [/deepseek|深度求索/i] },
-  { id: "xai", name: "xAI / Grok", patterns: [/\bxai\b|\bgrok\b/i] },
-  { id: "meta", name: "Meta / Llama", patterns: [/\bMeta\b/, /\bmeta\s?ai\b|\bllama\b/i] },
-  { id: "microsoft", name: "Microsoft / Copilot", patterns: [/microsoft|copilot|微软/i] },
-  { id: "nvidia", name: "NVIDIA", patterns: [/nvidia|英伟达|\bnemotron\b|\bnemo\b|\bblackwell\b|\brubin(?:\s+ultra)?\b|\bcuda\b/i] },
-  { id: "qwen", name: "千问 Qwen", patterns: [/\bqwen|通义|千问/i] },
-  { id: "hugging-face", name: "Hugging Face", patterns: [/hugging\s?face/i] },
-  { id: "cursor", name: "Cursor", patterns: [/\bCursor\b/] },
-  { id: "kimi", name: "Kimi / 月之暗面", patterns: [/\bkimi\b|月之暗面|\bmoonshot\s?ai\b/i] },
-  { id: "openrouter", name: "OpenRouter", patterns: [/openrouter/i] },
-  { id: "minimax", name: "MiniMax", patterns: [/minimax/i] },
-  { id: "zhipu", name: "智谱 GLM", patterns: [/智谱|\bglm-?[4-9]/i] },
-  { id: "hunyuan", name: "腾讯混元", patterns: [/混元|hunyuan/i] },
-  { id: "doubao", name: "字节豆包", patterns: [/豆包|doubao|字节跳动|bytedance/i] },
-  { id: "mistral", name: "Mistral", patterns: [/mistral/i] },
-  { id: "perplexity", name: "Perplexity", patterns: [/\bPerplexity\b/] },
-  { id: "runway", name: "Runway", patterns: [/\brunway\b/i] },
-  { id: "suno", name: "Suno", patterns: [/\bsuno\b/i] },
-  { id: "midjourney", name: "Midjourney", patterns: [/midjourney/i] },
-  { id: "stability-ai", name: "Stability AI", patterns: [/stability\s?ai/i] },
-  { id: "elevenlabs", name: "ElevenLabs", patterns: [/eleven\s?labs/i] },
-  { id: "vllm", name: "vLLM", patterns: [/\bvllm\b/i] },
-  { id: "ollama", name: "Ollama", patterns: [/\bollama\b/i] },
-  { id: "windsurf", name: "Windsurf", patterns: [/windsurf/i] },
-  { id: "devin", name: "Devin", patterns: [/\bdevin\b/i] },
-  { id: "manus", name: "Manus", patterns: [/\bmanus\b/i] },
-  { id: "apple", name: "Apple AI", patterns: [/\bapple\s?(intelligence|silicon|ai)\b|苹果(智能|\s?AI)/i] },
-  { id: "amazon", name: "Amazon / AWS", patterns: [/amazon|\baws\b|亚马逊/i] },
-  { id: "baidu", name: "百度文心", patterns: [/百度|baidu|文心|\bernie\s?bot\b/i] },
+  { id: "senssun", name: "香山 / SENSSUN / CAMRY", patterns: [/香山|senssun|camry|金叶|康美/i] },
+  { id: "xiaomi", name: "小米 / 米家", patterns: [/小米|米家|xiaomi|mijia/i] },
+  { id: "huawei", name: "华为", patterns: [/华为|huawei/i] },
+  { id: "honor", name: "荣耀", patterns: [/荣耀|honor/i] },
+  { id: "wole", name: "沃莱", patterns: [/沃莱|\bwole\b/i] },
+  { id: "yunmai", name: "云麦", patterns: [/云麦|yunmai/i] },
+  { id: "lifesense", name: "乐心", patterns: [/乐心|lifesense/i] },
+  { id: "withings", name: "Withings", patterns: [/withings/i] },
+  { id: "tanita", name: "Tanita", patterns: [/tanita|百利达/i] },
+  { id: "omron", name: "Omron", patterns: [/omron|欧姆龙/i] },
+  { id: "inbody", name: "InBody", patterns: [/inbody/i] },
+  { id: "fitbit", name: "Fitbit", patterns: [/fitbit/i] },
+  { id: "garmin", name: "Garmin", patterns: [/garmin|佳明/i] },
+  { id: "renpho", name: "Renpho", patterns: [/renpho/i] },
+  { id: "etekcity", name: "Etekcity", patterns: [/etekcity/i] },
+  { id: "arboleaf", name: "arboleaf", patterns: [/arboleaf/i] },
+  { id: "ti", name: "TI", patterns: [/texas instruments|德州仪器|\bti\b/i] },
+  { id: "adi", name: "ADI", patterns: [/analog devices|亚德诺|\badi\b/i] },
+  { id: "chipsemi", name: "芯海", patterns: [/芯海|chipsea/i] },
+  { id: "nordic", name: "Nordic", patterns: [/nordic/i] },
+  { id: "telink", name: "泰凌微", patterns: [/泰凌微|telink/i] },
+  { id: "espressif", name: "乐鑫", patterns: [/乐鑫|espressif|esp32/i] },
+  { id: "juwei", name: "巨微", patterns: [/巨微|juwei/i] },
 ];
 
-/** 这些域名上的文章，发布方就是对应的公司（托管平台如 GitHub、arXiv 不算）。 */
+/** 这些域名上的文章，发布方就是对应的公司（托管平台不算）。 */
 export const PUBLISHER_DOMAINS: ReadonlyArray<{ entityId: string; domains: readonly string[] }> = [
-  { entityId: "openai", domains: ["openai.com"] },
-  { entityId: "anthropic", domains: ["anthropic.com", "claude.com"] },
-  { entityId: "google", domains: ["deepmind.google", "ai.google", "blog.google"] },
-  { entityId: "deepseek", domains: ["deepseek.com"] },
-  { entityId: "xai", domains: ["x.ai"] },
-  { entityId: "meta", domains: ["ai.meta.com"] },
-  { entityId: "microsoft", domains: ["microsoft.com"] },
-  { entityId: "nvidia", domains: ["nvidia.com"] },
-  { entityId: "qwen", domains: ["qwen.ai"] },
-  { entityId: "cursor", domains: ["cursor.com"] },
-  { entityId: "openrouter", domains: ["openrouter.ai"] },
+  { entityId: "senssun", domains: ["senssun.com", "camry.com.cn"] },
+  { entityId: "xiaomi", domains: ["mi.com"] },
+  { entityId: "huawei", domains: ["huawei.com"] },
+  { entityId: "honor", domains: ["honor.com"] },
+  { entityId: "withings", domains: ["withings.com"] },
+  { entityId: "tanita", domains: ["tanita.com"] },
+  { entityId: "omron", domains: ["omron.com"] },
+  { entityId: "inbody", domains: ["inbody.com"] },
+  { entityId: "fitbit", domains: ["fitbit.com"] },
+  { entityId: "garmin", domains: ["garmin.com"] },
+  { entityId: "renpho", domains: ["renpho.com"] },
+  { entityId: "etekcity", domains: ["etekcity.com"] },
+  { entityId: "arboleaf", domains: ["arboleaf.com"] },
 ];
 
 /** 原文里的这些写法也算提到了对应公司。 */
 export const IDENTITY_CONTEXT_ALIASES: ReadonlyArray<{ entityId: string; pattern: RegExp }> = [
-  { entityId: "meta", pattern: /@AIatMeta\b/i },
-  { entityId: "zhipu", pattern: /\bZhipu(?:\s+AI\b|['’]s\b)/i },
+  { entityId: "senssun", pattern: /@SENSSUN\b|@CAMRY\b/i },
+  { entityId: "xiaomi", pattern: /@Xiaomi\b|@mi\b/i },
+  { entityId: "huawei", pattern: /@Huawei\b|@HuaweiMobile\b/i },
 ];
