@@ -124,7 +124,7 @@ export const TOPIC_TAGS = [
 
 /** 可选的实体标签（公司、机构、平台）。 */
 export const ENTITY_TAGS = [
-  "小米", "华为", "荣耀", "沃莱", "云麦", "乐心", "香山",
+  "小米", "华为", "荣耀", "沃莱", "云麦", "乐心", "汇宝", "永衡", "新域", "乐福", "香山",
   "Withings", "Tanita", "Omron", "InBody", "Fitbit", "Garmin", "Renpho", "Etekcity", "arboleaf",
   "TI", "ADI", "芯海", "Nordic", "泰凌微", "乐鑫", "巨微",
   "Amazon", "天猫", "京东", "抖音", "TikTok Shop",
@@ -218,6 +218,15 @@ export const ENTITIES: Record<string, { name: string; displayTag: string | null;
     aliases: ["乐心", "乐心医疗", "Lifesense"],
     orgNames: ["广东乐心医疗电子股份有限公司", "乐心医疗", "Lifesense"],
   },
+  huibao: { name: "汇宝", displayTag: "汇宝", aliases: ["汇宝"] },
+  yeshm: {
+    name: "永衡良品",
+    displayTag: "永衡",
+    aliases: ["永衡", "永衡良品", "YESHM"],
+    orgNames: ["广东永衡良品科技有限公司", "永衡良品", "YESHM"],
+  },
+  xinyu: { name: "新域", displayTag: "新域", aliases: ["新域"] },
+  lefu: { name: "乐福", displayTag: "乐福", aliases: ["乐福"] },
   withings: { name: "Withings", displayTag: "Withings", aliases: ["Withings"], orgNames: ["Withings"] },
   tanita: { name: "Tanita", displayTag: "Tanita", aliases: ["Tanita", "百利达"], orgNames: ["Tanita"] },
   omron: { name: "Omron 欧姆龙", displayTag: "Omron", aliases: ["Omron", "欧姆龙"], orgNames: ["Omron", "欧姆龙"] },
@@ -253,6 +262,10 @@ export const IDENTITY_LEXICON: ReadonlyArray<{ id: string; name: string; pattern
   { id: "wole", name: "沃莱", patterns: [/沃莱|\bwole\b/i] },
   { id: "yunmai", name: "云麦", patterns: [/云麦|yunmai/i] },
   { id: "lifesense", name: "乐心", patterns: [/乐心|lifesense/i] },
+  { id: "huibao", name: "汇宝", patterns: [/汇宝/] },
+  { id: "yeshm", name: "永衡 / YESHM", patterns: [/永衡|yeshm/i] },
+  { id: "xinyu", name: "新域", patterns: [/新域/] },
+  { id: "lefu", name: "乐福", patterns: [/(?<!家)乐福/] },
   { id: "withings", name: "Withings", patterns: [/withings/i] },
   { id: "tanita", name: "Tanita", patterns: [/tanita|百利达/i] },
   { id: "omron", name: "Omron", patterns: [/omron|欧姆龙/i] },
@@ -274,6 +287,7 @@ export const IDENTITY_LEXICON: ReadonlyArray<{ id: string; name: string; pattern
 /** 这些域名上的文章，发布方就是对应的公司（托管平台不算）。 */
 export const PUBLISHER_DOMAINS: ReadonlyArray<{ entityId: string; domains: readonly string[] }> = [
   { entityId: "senssun", domains: ["senssun.com", "camry.com.cn"] },
+  { entityId: "yeshm", domains: ["yeshm.com"] },
   { entityId: "xiaomi", domains: ["mi.com"] },
   { entityId: "huawei", domains: ["huawei.com"] },
   { entityId: "honor", domains: ["honor.com"] },

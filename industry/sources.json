@@ -324,6 +324,72 @@
       ],
       "site_fulltext": false,
       "syndicate_fulltext": false
+    },
+    {
+      "id": "web-yeshm-news",
+      "name": "永衡良品 · 资讯",
+      "kind": "web_list",
+      "config": {
+        "url": "https://www.yeshm.com/news/list",
+        "itemSelector": "div.news-item",
+        "linkSelector": "a.yeshm-link",
+        "publishedAtSelector": "p.date",
+        "_aihot": {
+          "initialBackfillLimit": 10
+        }
+      },
+      "tier": "T1",
+      "owner_entity_id": "yeshm",
+      "participation_mode": "editorial",
+      "interval_minutes": 720,
+      "tags": [
+        "官方",
+        "展会"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "google-news-hengqi",
+      "name": "Google 新闻 · 衡器",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://news.google.com/rss/search?q=%E8%A1%A1%E5%99%A8%20when%3A30d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+        "_aihot": {
+          "initialBackfillLimit": 10
+        }
+      },
+      "tier": "T2",
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 60,
+      "tags": [
+        "媒体",
+        "搜索"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
+    },
+    {
+      "id": "google-news-pricing-scale",
+      "name": "Google 新闻 · 电子计价秤",
+      "kind": "rss",
+      "config": {
+        "feedUrl": "https://news.google.com/rss/search?q=%E7%94%B5%E5%AD%90%E8%AE%A1%E4%BB%B7%E7%A7%A4%20when%3A90d&hl=zh-CN&gl=CN&ceid=CN:zh-Hans",
+        "_aihot": {
+          "initialBackfillLimit": 10
+        }
+      },
+      "tier": "T2",
+      "owner_entity_id": null,
+      "participation_mode": "editorial",
+      "interval_minutes": 120,
+      "tags": [
+        "媒体",
+        "搜索"
+      ],
+      "site_fulltext": false,
+      "syndicate_fulltext": false
     }
   ]
 }
