@@ -1,0 +1,21 @@
+{
+  "name": "@aihot/pricing",
+  "private": true,
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": "./module.ts",
+    "./server": "./server.ts",
+    "./web": "./web.tsx"
+  },
+  "dependencies": {
+    "@aihot/api": "*",
+    "@aihot/backend": "*",
+    "@aihot/contracts": "*",
+    "@aihot/site": "*",
+    "fastify": "5.12.5",
+    "react": "19.3.0",
+    "react-router": "8.4.0",
+    "zod": "4.6.5"
+  }
+}
