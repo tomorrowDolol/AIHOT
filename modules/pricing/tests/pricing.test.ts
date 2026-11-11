@@ -189,6 +189,18 @@ test("10 天没再采到就算下架，人工贴一次价格又回到在售", as
   assert.equal(brand.gone, before.gone);
 });
 
+test("全部下架的品牌仍列出，平台是空数组而不是 null", async () => {
+  await app.inject({
+    method: "POST", url: "/api/pricing/ingest", headers: PUSH,
+    payload: { rows: [{ platform: "taobao", sku: `gone-${T}`, brand: "xinyu", title: "新域 体重秤", url: `https://item.taobao.com/${T}g.htm`, price: 88 }] },
+  });
+  await sql`UPDATE pricing_offer SET last_seen_at = now() - interval '30 days' WHERE sku = ${`gone-${T}`}`;
+
+  const brand = (await brandSummaries()).find((b) => b.brand === "xinyu")!;
+  assert.equal(brand.offers, 0, "一个在售都没有，仍为备查列出");
+  assert.deepEqual(brand.platforms, [], "首页要能直接 join，不能拿到 null");
+});
+
 test("品牌页接口只认词表里的品牌，没数据是 404", async () => {
   const ok = await app.inject({ method: "GET", url: "/api/v1/pricing/brands/lefu" });
   assert.equal(ok.statusCode, 200);

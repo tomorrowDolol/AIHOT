@@ -145,7 +145,7 @@ export async function brandSummaries(db: Db = sql): Promise<BrandSummary[]> {
            count(*) FILTER (WHERE o.live)::int AS offers,
            count(*) FILTER (WHERE NOT o.live)::int AS gone,
            count(DISTINCT o.shop) FILTER (WHERE o.live)::int AS shops,
-           array_agg(DISTINCT o.platform) FILTER (WHERE o.live) AS platforms,
+           COALESCE(array_agg(DISTINCT o.platform) FILTER (WHERE o.live), '{}') AS platforms,
            min(l.price) FILTER (WHERE o.live) AS lowest, max(l.price) FILTER (WHERE o.live) AS highest,
            max(l.at) AS "latestAt",
            count(*) FILTER (WHERE o.live AND o.first_seen_at >= now() - interval '7 days')::int AS fresh
