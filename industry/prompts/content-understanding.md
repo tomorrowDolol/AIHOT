@@ -16,7 +16,7 @@
 - `recall_quality`：召回、下架、处罚、质量事故与诉讼
 - `component_change`：器件、模组、方案、产能、涨价、交期、PCN、EOL
 - `channel_rule`：平台类目、准入、佣金、物流、评价与广告规则
-- `company_capital`：财报、出货、均价、融资、并购、产能、人事
+- `company_capital`：财报、出货、均价、融资、并购、产能、人事，以及 App 与平台上的经营结果
 - `technical_research`：测量原理、算法、临床对照、专利
 - `teardown_review`：拆机报告、带数据的实测与横评
 - `market_data`：市场份额、榜单、价格带与区域数据
