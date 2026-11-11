@@ -222,8 +222,8 @@ export async function upsertMaterial(m: MaterialInput, db: Db = sql): Promise<Ma
 }
 
 async function lockMaterial(db: Db, identityKey: string) {
-  const [existing] = await db<{ id: string; source_id: string; revision: number; content_hash: string | null; backfill: boolean; published_at: Date | null; publication_time: string | null; title: string; body_text: string | null; excerpt: string | null; participation_mode: string }[]>`
-    SELECT a.id, a.source_id, a.revision, a.content_hash, a.backfill, a.published_at, a.publication_time, a.title, a.body_text, a.excerpt, s.participation_mode
+  const [existing] = await db<{ id: string; source_id: string; revision: number; content_hash: string | null; backfill: boolean; published_at: Date | null; publication_time: string | null; title: string; body_text: string | null; excerpt: string | null; body_status: string; participation_mode: string }[]>`
+    SELECT a.id, a.source_id, a.revision, a.content_hash, a.backfill, a.published_at, a.publication_time, a.title, a.body_text, a.excerpt, a.body_status, s.participation_mode
     FROM articles a JOIN sources s ON s.id = a.source_id WHERE a.identity_key = ${identityKey} FOR UPDATE OF a`;
   return existing;
 }
@@ -299,6 +299,13 @@ async function upsertIn(db: Db, m: MaterialInput): Promise<MaterialResult> {
   const next = contentHash({ title, bodyText, excerpt });
   if (!time && existing!.content_hash === next) {
     await updatePresentation(db, existing!.id, { html: m.bodyHtml, media: m.media });
+    // A caller that reports a body status explicitly may still need the stored one corrected (the
+    // material itself is unchanged; the summary-only declaration arrived after an earlier push of
+    // the same entry). This is presentation state, not content: no revision, no reanalysis.
+    const explicitStatus = m.bodyStatus ?? null;
+    if (explicitStatus && explicitStatus !== existing!.body_status) {
+      await db`UPDATE articles SET body_status = ${explicitStatus} WHERE id = ${existing!.id}`;
+    }
     return unchanged;
   }
   if (!time && existing!.content_hash === null) {
@@ -321,11 +328,15 @@ async function upsertIn(db: Db, m: MaterialInput): Promise<MaterialResult> {
   if (!time && sameBarringLoss(existing!.title, title) && sameBarringLoss(existing!.body_text, bodyText) && sameBarringLoss(existing!.excerpt, excerpt)) return unchanged;
 
   const media = m.media ? sql.json(m.media as never) : null;
+  // A caller that states a body status explicitly (an ingest pusher reporting "summary only")
+  // overrides the stored one even without body text; the CASE below only protects callers that
+  // leave the status unset and merely repeat a listing entry with no material.
+  const explicitStatus = m.bodyStatus ?? null;
   await reviseMaterial(db, existing!.id, {
     set: sql`title = ${title}, author = coalesce(${m.author ?? null}, author), language = coalesce(${m.language ?? null}, language),
       source_updated_at = ${m.sourceUpdatedAt ?? null}, excerpt = coalesce(${m.excerpt ?? null}, excerpt),
       body_text = coalesce(${m.bodyText ?? null}, body_text), body_html = coalesce(${m.bodyHtml ?? null}, body_html),
-      body_status = CASE WHEN ${m.bodyText ?? null}::text IS NULL THEN body_status ELSE ${m.bodyStatus ?? "ok"} END,
+      body_status = coalesce(${explicitStatus ?? null}, CASE WHEN ${m.bodyText ?? null}::text IS NULL THEN body_status ELSE ${m.bodyStatus ?? "ok"} END),
       media = CASE WHEN ${media}::jsonb IS NULL THEN media ELSE ${media}::jsonb END,
       x_post = coalesce(${m.xPost ? sql.json(m.xPost as never) : null}, x_post)`,
     hash: next, title, bodyText,

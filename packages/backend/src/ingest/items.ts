@@ -6,6 +6,8 @@ import { upsertMaterial } from "../content/materials.ts";
 import { queueProcessing } from "../jobs/content.ts";
 import { readPublicationDate } from "../sources/dates.ts";
 import { normalizeUrl } from "../lib/url.ts";
+import { sanitizeBody } from "../content/sanitize.ts";
+import { stripTags, collapseWhitespace } from "../lib/text.ts";
 
 export const MAX_ITEMS = 50;
 
@@ -22,7 +24,23 @@ interface ItemIn {
   url?: unknown;
   publishedAt?: unknown;
   author?: unknown;
+  /** Pusher-provided digest, stored as the excerpt. */
+  summary?: unknown;
+  /** Pusher-provided full HTML; sanitized before storage, never trusted raw. */
+  content?: unknown;
   raw?: { _aihot?: { backfill?: boolean; baseline?: boolean } } & Record<string, unknown>;
+}
+
+/** A pusher's summary/content become the material's excerpt/body. Without either, the entry stays
+ * pending on a body that never arrives (WeChat pages are excluded from page fetching), so the
+ * status mirrors exactly what was reported instead of promising a fetch that will not happen. */
+function materialBody(it: ItemIn): { excerpt: string | null; bodyHtml: string | null; bodyText: string | null; bodyStatus: "ok" | "none" | "pending" } {
+  const summary = typeof it.summary === "string" && it.summary.trim() ? collapseWhitespace(it.summary).slice(0, 2000) : null;
+  const content = typeof it.content === "string" && it.content.trim() ? it.content : null;
+  const bodyHtml = content ? sanitizeBody(content) : null;
+  const bodyText = bodyHtml ? collapseWhitespace(stripTags(bodyHtml)).slice(0, 200_000) || null : null;
+  const bodyStatus = bodyText ? "ok" : summary ? "none" : "pending";
+  return { excerpt: summary, bodyHtml, bodyText, bodyStatus };
 }
 
 export async function ingestItems(body: { sourceId?: unknown; sourceName?: unknown; items?: unknown }): Promise<{ ok: true; created: number }> {
@@ -51,6 +69,7 @@ export async function ingestItems(body: { sourceId?: unknown; sourceName?: unkno
     seen.add(url);
     const publication = readPublicationDate(typeof it.publishedAt === "string" ? it.publishedAt : null, "+00:00");
     const flags = it.raw?._aihot ?? {};
+    const body = materialBody(it);
     const res = await upsertMaterial({
       sourceId: source!.id,
       // Normalize only for deduplication. Ownership needs the reported origin (including www and
@@ -59,6 +78,10 @@ export async function ingestItems(body: { sourceId?: unknown; sourceName?: unkno
       title,
       author: typeof it.author === "string" ? it.author.slice(0, 200) : null,
       ...publication,
+      excerpt: body.excerpt,
+      bodyHtml: body.bodyHtml,
+      bodyText: body.bodyText,
+      bodyStatus: body.bodyStatus,
       raw: it.raw ?? null,
       via: "ingest",
       backfill: flags.backfill ? "reported-backfill" : flags.baseline ? "reported-baseline" : null,
